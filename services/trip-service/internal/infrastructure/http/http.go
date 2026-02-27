@@ -33,8 +33,6 @@ func (s *Handler) HandleTripPreview(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	log.Println("ddfsdsadsadsadd===============")
-
 	t, err := s.service.GetRoute(r.Context(), &reqBody.Pickup, &reqBody.Destination)
 	if err != nil {
 		log.Panic(err)
