@@ -33,12 +33,18 @@ func (s *Handler) HandleTripPreview(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	t, err := s.service.GetRoute(r.Context(), &reqBody.Pickup, &reqBody.Destination)
+	ctx := r.Context()
+
+	osrmResp, err := s.service.GetRoute(ctx, &reqBody.Pickup, &reqBody.Destination)
 	if err != nil {
-		log.Panic(err)
+		log.Printf("failed to get route from OSRM: %v", err)
+		http.Error(w, "failed to get route", http.StatusInternalServerError)
+		return
 	}
 
-	writeJSON(w, http.StatusCreated, t)
+	if err := writeJSON(w, http.StatusOK, osrmResp.ToTripPreview()); err != nil {
+		log.Printf("failed to write json response: %v", err)
+	}
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) error {
