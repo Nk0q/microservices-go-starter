@@ -22,8 +22,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /trip/preview", enableCORS(handleTripPreview))
-	mux.HandleFunc("/ws/drivers", enableCORS(handleDriversWebSocket))
-	mux.HandleFunc("/ws/riders", enableCORS(handleRidersWebSocket))
+	mux.HandleFunc("/ws/drivers", handleDriversWebSocket)
+	mux.HandleFunc("/ws/riders", handleRidersWebSocket)
 
 	server := &http.Server{
 		Addr:    httpAddr,
@@ -38,8 +38,7 @@ func main() {
 	}()
 
 	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
-
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 	select {
 	case err := <-serverErrors:
 		log.Printf("Error starting the server: %v", err)
